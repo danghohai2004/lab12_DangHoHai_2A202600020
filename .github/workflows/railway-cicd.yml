@@ -1,0 +1,59 @@
+name: Agent CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ==========================================
+  # STAGE 1: Continuous Integration (CI)
+  # ==========================================
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip" # Tăng tốc độ cài đặt packages
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r 03-cloud-deployment/railway/requirements.txt
+          pip install flake8 pytest
+
+      - name: Check Syntax & Code Quality (Linting)
+        run: |
+          # Dừng build ngay lập tức nếu có lỗi cú pháp nghiêm trọng
+          flake8 06-lab-complete/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      # (Tùy chọn) Chạy Unit Test nếu bạn có file test
+      # - name: Run Tests
+      #   run: pytest tests/
+
+  # ==========================================
+  # STAGE 2: Continuous Deployment (CD)
+  # ==========================================
+  deploy-to-railway:
+    needs: test-and-lint # Chỉ chạy khi bước Test thành công
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Chỉ deploy khi code vào nhánh main
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy to Railway
+        run: railway up --service "Agent API" --detach
+        env:
+          # Token này lấy từ Railway Dashboard và cấu hình vào GitHub Secrets
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
