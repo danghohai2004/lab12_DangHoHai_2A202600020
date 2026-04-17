@@ -1,0 +1,13 @@
+[project]
+name = "lab12-danghohai-2a202600020"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.115.0",
+    "jwt>=1.4.0",
+    "pyjwt>=2.12.1",
+    "python-dotenv==1.0.1",
+    "uvicorn[standard]==0.30.0",
+]

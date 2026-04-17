@@ -4,10 +4,12 @@
 Đây là cách KHÔNG NÊN làm. Dùng để so sánh với advanced/.
 Hãy đếm bao nhiêu vấn đề bạn tìm được trong file này.
 """
+
 import os
 
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
+
 from utils.mock_llm import ask
 
 app = FastAPI(title="My Agent")
@@ -48,7 +50,7 @@ if __name__ == "__main__":
     print("Starting agent on localhost:8000...")
     uvicorn.run(
         "app:app",
-        host="localhost",   # ❌ chỉ chạy được trên local
-        port=8000,          # ❌ cứng port
-        reload=True         # ❌ debug reload trong production
+        host="localhost",  # ❌ chỉ chạy được trên local
+        port=8000,  # ❌ cứng port
+        reload=True,  # ❌ debug reload trong production
     )

@@ -9,19 +9,21 @@ So sánh với basic/app.py để thấy sự khác biệt:
   ✅ 0.0.0.0 binding (chạy được trong container)
   ✅ Port từ PORT env var (Railway/Render inject tự động)
 """
+
+import json
+import logging
 import os
 import signal
-import logging
-import json
 import time
-from datetime import datetime, timezone
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
-
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from config import settings
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 from utils.mock_llm import ask
 
 # ✅ Structured JSON logging — dễ parse trong log aggregator (Datadog, Loki...)
@@ -46,13 +48,17 @@ async def lifespan(app: FastAPI):
     global is_ready
 
     # --- Startup ---
-    logger.info(json.dumps({
-        "event": "startup",
-        "app": settings.app_name,
-        "version": settings.app_version,
-        "env": settings.environment,
-        "port": settings.port,
-    }))
+    logger.info(
+        json.dumps(
+            {
+                "event": "startup",
+                "app": settings.app_name,
+                "version": settings.app_version,
+                "env": settings.environment,
+                "port": settings.port,
+            }
+        )
+    )
     # Simulate loading model/connecting DB
     time.sleep(0.1)
     is_ready = True
@@ -86,6 +92,7 @@ app.add_middleware(
 # ENDPOINTS
 # ============================================================
 
+
 @app.get("/")
 def root():
     return {
@@ -96,27 +103,35 @@ def root():
     }
 
 
-@app.post("/ask")
-async def ask_agent(request: Request):
-    body = await request.json()
-    question = body.get("question", "")
+class AskRequest(BaseModel):
+    question: str
 
-    if not question:
-        raise HTTPException(status_code=422, detail="question field is required")
+
+@app.post("/ask")
+async def ask_agent(payload: AskRequest, request: Request):
+    question = payload.question
 
     # ✅ Structured logging — KHÔNG log secrets
-    logger.info(json.dumps({
-        "event": "agent_request",
-        "question_length": len(question),
-        "client_ip": request.client.host,
-    }))
+    logger.info(
+        json.dumps(
+            {
+                "event": "agent_request",
+                "question_length": len(question),
+                "client_ip": request.client.host,
+            }
+        )
+    )
 
     response = ask(question)
 
-    logger.info(json.dumps({
-        "event": "agent_response",
-        "response_length": len(response),
-    }))
+    logger.info(
+        json.dumps(
+            {
+                "event": "agent_response",
+                "response_length": len(response),
+            }
+        )
+    )
 
     return {
         "question": question,
@@ -128,6 +143,7 @@ async def ask_agent(request: Request):
 # ============================================================
 # HEALTH CHECK — Required for cloud deployment
 # ============================================================
+
 
 @app.get("/health")
 def health_check():
@@ -174,6 +190,7 @@ def metrics():
 # GRACEFUL SHUTDOWN
 # ============================================================
 
+
 def handle_sigterm(*args):
     """
     ✅ Xử lý SIGTERM — signal mà platform gửi khi muốn tắt container.
@@ -190,7 +207,7 @@ if __name__ == "__main__":
     logger.info(f"Starting {settings.app_name} on {settings.host}:{settings.port}")
     uvicorn.run(
         "app:app" if settings.debug else app,
-        host=settings.host,   # ✅ 0.0.0.0 — nhận kết nối từ bên ngoài container
-        port=settings.port,    # ✅ từ PORT env var
-        reload=settings.debug, # ✅ reload chỉ khi DEBUG=true
+        host=settings.host,  # ✅ 0.0.0.0 — nhận kết nối từ bên ngoài container
+        port=settings.port,  # ✅ từ PORT env var
+        reload=settings.debug,  # ✅ reload chỉ khi DEBUG=true
     )

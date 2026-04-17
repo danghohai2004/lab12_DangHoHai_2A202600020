@@ -1,4 +1,5 @@
-#  Delivery Checklist — Day 12 Lab Submission
+
+#  Delivery Checklist — Day 13 Lab Submission
 
 > **Student Name:** Đặng Hồ Hải 
 > **Student ID:** 2A202600020 
@@ -20,32 +21,40 @@ Create a file `MISSION_ANSWERS.md` with your answers to all exercises:
 ## Part 1: Localhost vs Production
 
 ### Exercise 1.1: Anti-patterns found
-1. [Your answer]
-2. [Your answer]
-...
+1. Hardcode API Key và thông tin nhạy cảm
+2. Thiếu quản lý cấu hình
+3. Sử dụng Print thay vì hệ thống logging
+4. Không có Health Check
+5. Fit cứng cấu hình Sever
 
 ### Exercise 1.3: Comparison table
 | Feature | Develop | Production | Why Important? |
 |---------|---------|------------|----------------|
-| Config  | ...     | ...        | ...            |
-...
+| Config | Hardcoded trực tiếp trong code | Environment Variables / File config | Bảo mật API key, dễ dàng thay đổi cấu hình giữa các môi trường mà không cần sửa code. |
+| Logging | Dùng `print()`, có thể làm lộ secret | Structured JSON Logging, thiết lập mức độ log | Dễ dàng parse và phân tích trên hệ thống log tập trung, không rò rỉ thông tin nhạy cảm. |
+| Health Check | Không có endpoint nào | Có endpoints `/health`, `/ready`, `/metrics` | Cho phép các nền tảng (Docker, K8s, Cloud) giám sát trạng thái và tự động restart ứng dụng khi crash. |
+| Host & Port | Cố định `localhost:8000` | Bind `0.0.0.0` và lấy PORT từ biến môi trường | Đảm bảo ứng dụng nhận traffic từ bên ngoài container và tương thích với mclọi nền tảng Cloud. |
+| App Lifecycle | Dừng đột ngột, `reload=True` | Graceful Shutdown, tắt `reload` ở production | Hoàn tất request đang dở, đóng kết nối DB an toàn, không rớt request của người dùng khi update/restart. |
 
 ## Part 2: Docker
 
 ### Exercise 2.1: Dockerfile questions
-1. Base image: [Your answer]
-2. Working directory: [Your answer]
-...
+1. Base image: `python:3.11-slim` (cho cả builder và runtime)
+2. Working directory: `/app`
+3. Tại sao COPY requirements.txt trước?: Giúp tận dụng được cache của Docker vì khi mã nguồn thay đổi mà đặt trước COPY requirements.txt thì các layer bên dưới nó mất cache và Docker sẽ build lại tất cả layer nằm bên dưới nó, nghĩa là phải cài lại các thư viện trong requirements.txt
+4. CMD vs ENTRYPOINT khác nhau thế nào?: 
+ - CMD được sử dụng để cung cấp lệnh hoặc tham số mặc định cho container, nếu user không truyền vào tham số gì thì sẽ chạy lệnh trong CMD ngược lại thì sẽ bị ghi đè nếu user truyền vào tham số khác.
+ - ENTRYPOINT: là một lệnh bắt buộc khi chạy, nó không bị ghi đè, nếu user truyền tham số vào thì nó sẽ append với lệnh trong ENTRYPOINT
 
 ### Exercise 2.3: Image size comparison
-- Develop: [X] MB
-- Production: [Y] MB
-- Difference: [Z]%
+- Develop: 1660 MB
+- Production: 236 MB
+- Difference: 85.78 %
 
 ## Part 3: Cloud Deployment
 
 ### Exercise 3.1: Railway deployment
-- URL: https://your-app.railway.app
+- URL: https://captivating-alignment-production.up.railway.app/
 - Screenshot: [Link to screenshot in repo]
 
 ## Part 4: API Security
@@ -97,7 +106,7 @@ your-repo/
 -  Graceful shutdown
 -  Stateless design (Redis)
 -  No hardcoded secrets
-
+cl
 ---
 
 ### 3. Service Domain Link

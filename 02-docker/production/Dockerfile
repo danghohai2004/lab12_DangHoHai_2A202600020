@@ -49,7 +49,7 @@ COPY 02-docker/production/main.py .
 
 # Copy utils from project root
 RUN mkdir -p /app/utils
-COPY utils/mock_llm.py /app/utils/mock_llm.py
+COPY ./utils/mock_llm.py /app/utils/mock_llm.py
 
 # Đặt ownership cho appuser
 RUN chown -R appuser:appuser /app
