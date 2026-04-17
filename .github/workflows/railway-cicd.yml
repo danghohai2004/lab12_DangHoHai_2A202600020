@@ -41,9 +41,9 @@ jobs:
   # STAGE 2: Continuous Deployment (CD)
   # ==========================================
   deploy-to-railway:
-    needs: test-and-lint # Chỉ chạy khi bước Test thành công
+    needs: test-and-lint
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Chỉ deploy khi code vào nhánh main
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout Code
@@ -53,7 +53,10 @@ jobs:
         run: npm i -g @railway/cli
 
       - name: Deploy to Railway
-        run: railway up --service "Agent API" --detach
+        # 1. Chuyển vào folder chứa code (ví dụ 05-scaling-reliability/production)
+        # 2. Dùng đúng tên service "captivating-alignment"
+        run: |
+          cd 05-scaling-reliability/production
+          railway up --service "captivating-alignment" --detach
         env:
-          # Token này lấy từ Railway Dashboard và cấu hình vào GitHub Secrets
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
