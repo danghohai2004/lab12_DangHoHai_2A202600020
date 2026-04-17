@@ -53,7 +53,7 @@ Create a file `MISSION_ANSWERS.md` with your answers to all exercises:
 
 ### Exercise 3.1: Railway deployment
 - URL: https://captivating-alignment-production.up.railway.app/
-- Screenshot: ![Kết quả](screen.png)
+- Screenshot: ![ressult](screenshots/screen.png)
 
 ## Part 4: API Security
 
@@ -325,7 +325,7 @@ Chào Gemma 3, mình đã deploy thành công trên Railway rồi đúng không?
 
 ## Screenshots
 - [Deployment dashboard](screenshots/dashboard.png)
-- [Service running](screenshots/running.png)
+  - [Service running](screenshots/running.png)
 - [Test results](screenshots/test.png)
 ```
 
@@ -401,10 +401,9 @@ Req 12: BLocked (429)
 
 ##  Submission
 
-**Submit your GitHub repository URL:**
+**Submit your GitHub repository URL: https://github.com/danghohai2004/lab12_DangHoHai_2A202600020**
 
 ```
-https://github.com/danghohai2004/lab12_DangHoHai_2A202600020
 ```
 
 **Deadline:** 17/4/2026
