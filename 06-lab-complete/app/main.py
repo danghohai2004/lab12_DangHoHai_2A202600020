@@ -10,8 +10,7 @@ from datetime import datetime, timezone
 
 import google.generativeai as genai
 import redis.asyncio as redis
-
-# Import settings từ file config của bạn
+import uvicorn
 from app.config import settings
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
